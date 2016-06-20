@@ -1,0 +1,368 @@
+
+Starting Nmap 6.49BETA4 ( https://nmap.org ) at 2016-06-19 16:23 EDT
+Nmap scan report for 61.155.159.82
+Host is up (0.037s latency).
+All 1000 scanned ports on 61.155.159.82 are filtered
+
+Nmap scan report for 106.120.180.40
+Host is up (0.0088s latency).
+Not shown: 949 closed ports
+PORT      STATE    SERVICE
+21/tcp    filtered ftp
+80/tcp    open     http
+|_http-default-accounts: [ERROR] HTTP request table is empty. This should not happen since we at least made one request.
+| http-domino-enum-passwords:   
+|_  ERROR: Failed to process results
+81/tcp    open     hosts2-ns
+82/tcp    open     xfer
+84/tcp    open     ctf
+88/tcp    open     kerberos-sec
+|_krb5-enum-users: ERROR: No Kerberos REALM was supplied, aborting ...
+89/tcp    open     su-mit-tg
+90/tcp    open     dnsix
+135/tcp   filtered msrpc
+139/tcp   filtered netbios-ssn
+443/tcp   open     https
+|_http-default-accounts: [ERROR] HTTP request table is empty. This should not happen since we at least made one request.
+| http-domino-enum-passwords:   
+|_  ERROR: Failed to process results
+445/tcp   filtered microsoft-ds
+593/tcp   filtered http-rpc-epmap
+801/tcp   open     device
+901/tcp   filtered samba-swat
+1025/tcp  filtered NFS-or-IIS
+1132/tcp  filtered kvm-via-ip
+1175/tcp  filtered dossier
+1720/tcp  filtered h323q931
+1723/tcp  filtered pptp
+2323/tcp  open     3d-nfsd
+3000/tcp  open     ppp
+3030/tcp  open     arepa-cas
+3031/tcp  open     eppc
+3128/tcp  filtered squid-http
+4444/tcp  filtered krb524
+5222/tcp  open     xmpp-client
+6129/tcp  filtered unknown
+6566/tcp  filtered sane-port
+6666/tcp  open     irc
+6667/tcp  filtered irc
+6699/tcp  open     napster
+8000/tcp  open     http-alt
+|_http-default-accounts: [ERROR] HTTP request table is empty. This should not happen since we at least made one request.
+8022/tcp  open     oa-system
+8080/tcp  open     http-proxy
+|_http-default-accounts: [ERROR] HTTP request table is empty. This should not happen since we at least made one request.
+8081/tcp  open     blackice-icecap
+8082/tcp  open     blackice-alerts
+8085/tcp  open     unknown
+8088/tcp  open     radan-http
+|_http-default-accounts: [ERROR] HTTP request table is empty. This should not happen since we at least made one request.
+8090/tcp  open     unknown
+8180/tcp  open     unknown
+|_http-default-accounts: [ERROR] HTTP request table is empty. This should not happen since we at least made one request.
+8800/tcp  open     sunwebadmin
+9080/tcp  open     glrpc
+9090/tcp  open     zeus-admin
+| informix-query:   
+|_  ERROR: No credentials specified (see informix-table.username and informix-table.password)
+| informix-tables:   
+|_  ERROR: No credentials specified (see informix-table.username and informix-table.password)
+9102/tcp  open     jetdirect
+9418/tcp  filtered git
+12000/tcp filtered cce4x
+20000/tcp open     dnp
+32771/tcp filtered sometimes-rpc5
+32774/tcp filtered sometimes-rpc11
+65129/tcp filtered unknown
+
+Nmap scan report for 61.155.159.101
+Host is up (0.036s latency).
+Not shown: 998 filtered ports
+PORT     STATE SERVICE
+2718/tcp open  pn-requester2
+4003/tcp open  pxc-splr-ft
+
+Nmap scan report for 61.155.159.249
+Host is up (0.043s latency).
+Not shown: 999 filtered ports
+PORT   STATE SERVICE
+80/tcp open  http
+|_http-config-backup: ERROR: Script execution failed (use -d to debug)
+| http-domino-enum-passwords:   
+|_  ERROR: Failed to process results
+| http-vuln-cve2010-0738: 
+|_  /jmx-console/: Authentication was not required
+
+Nmap scan report for 175.25.171.17
+Host is up (0.0078s latency).
+Not shown: 951 closed ports
+PORT      STATE    SERVICE
+43/tcp    filtered whois
+70/tcp    filtered gopher
+80/tcp    open     http
+|_http-default-accounts: [ERROR] HTTP request table is empty. This should not happen since we at least made one request.
+| http-domino-enum-passwords:   
+|_  ERROR: Failed to process results
+81/tcp    open     hosts2-ns
+82/tcp    open     xfer
+88/tcp    open     kerberos-sec
+|_krb5-enum-users: ERROR: No Kerberos REALM was supplied, aborting ...
+89/tcp    open     su-mit-tg
+90/tcp    open     dnsix
+135/tcp   filtered msrpc
+139/tcp   filtered netbios-ssn
+445/tcp   filtered microsoft-ds
+543/tcp   filtered klogin
+593/tcp   filtered http-rpc-epmap
+800/tcp   open     mdbs_daemon
+808/tcp   filtered ccproxy-http
+901/tcp   filtered samba-swat
+1002/tcp  filtered windows-icfw
+1025/tcp  filtered NFS-or-IIS
+2000/tcp  filtered cisco-sccp
+2047/tcp  filtered dls
+2323/tcp  open     3d-nfsd
+3000/tcp  open     ppp
+3030/tcp  open     arepa-cas
+3128/tcp  filtered squid-http
+4444/tcp  filtered krb524
+5222/tcp  open     xmpp-client
+5280/tcp  open     xmpp-bosh
+6129/tcp  filtered unknown
+6666/tcp  open     irc
+6667/tcp  filtered irc
+7070/tcp  open     realserver
+8001/tcp  open     vcom-tunnel
+8009/tcp  open     ajp13
+8080/tcp  open     http-proxy
+|_http-default-accounts: [ERROR] HTTP request table is empty. This should not happen since we at least made one request.
+8081/tcp  open     blackice-icecap
+8083/tcp  open     us-srv
+8085/tcp  open     unknown
+8086/tcp  open     d-s-n
+8087/tcp  open     simplifymedia
+8088/tcp  open     radan-http
+|_http-default-accounts: [ERROR] HTTP request table is empty. This should not happen since we at least made one request.
+8090/tcp  open     unknown
+8888/tcp  open     sun-answerbook
+9000/tcp  open     cslistener
+9081/tcp  open     unknown
+9090/tcp  open     zeus-admin
+| informix-query:   
+|_  ERROR: No credentials specified (see informix-table.username and informix-table.password)
+| informix-tables:   
+|_  ERROR: No credentials specified (see informix-table.username and informix-table.password)
+9290/tcp  filtered unknown
+9999/tcp  open     abyss
+14238/tcp filtered unknown
+15000/tcp open     hydap
+
+Nmap scan report for 42.81.4.91
+Host is up (0.0069s latency).
+All 1000 scanned ports on 42.81.4.91 are filtered
+
+Nmap scan report for 60.207.246.216
+Host is up (0.0033s latency).
+Not shown: 959 closed ports
+PORT      STATE    SERVICE
+80/tcp    open     http
+|_http-default-accounts: [ERROR] HTTP request table is empty. This should not happen since we at least made one request.
+| http-domino-enum-passwords:   
+|_  ERROR: Failed to process results
+81/tcp    open     hosts2-ns
+82/tcp    open     xfer
+84/tcp    open     ctf
+88/tcp    open     kerberos-sec
+|_krb5-enum-users: ERROR: No Kerberos REALM was supplied, aborting ...
+89/tcp    open     su-mit-tg
+90/tcp    open     dnsix
+443/tcp   open     https
+|_http-default-accounts: [ERROR] HTTP request table is empty. This should not happen since we at least made one request.
+| http-domino-enum-passwords:   
+|_  ERROR: Failed to process results
+801/tcp   open     device
+1053/tcp  filtered remote-as
+1075/tcp  filtered rdrmshc
+1138/tcp  filtered encrypted_admin
+1247/tcp  filtered visionpyramid
+1334/tcp  filtered writesrv
+1688/tcp  filtered nsjtp-data
+1723/tcp  open     pptp
+2043/tcp  filtered isis-bcast
+2222/tcp  filtered EtherNetIP-1
+2323/tcp  open     3d-nfsd
+2811/tcp  filtered gsiftp
+3000/tcp  open     ppp
+3030/tcp  open     arepa-cas
+3031/tcp  open     eppc
+5222/tcp  open     xmpp-client
+6666/tcp  open     irc
+6699/tcp  open     napster
+8000/tcp  open     http-alt
+|_http-default-accounts: [ERROR] HTTP request table is empty. This should not happen since we at least made one request.
+8022/tcp  open     oa-system
+8080/tcp  open     http-proxy
+|_http-default-accounts: [ERROR] HTTP request table is empty. This should not happen since we at least made one request.
+8081/tcp  open     blackice-icecap
+8082/tcp  open     blackice-alerts
+8085/tcp  open     unknown
+8088/tcp  open     radan-http
+|_http-default-accounts: [ERROR] HTTP request table is empty. This should not happen since we at least made one request.
+8090/tcp  open     unknown
+8180/tcp  open     unknown
+|_http-default-accounts: [ERROR] HTTP request table is empty. This should not happen since we at least made one request.
+8800/tcp  open     sunwebadmin
+9080/tcp  open     glrpc
+9090/tcp  open     zeus-admin
+| informix-query:   
+|_  ERROR: No credentials specified (see informix-table.username and informix-table.password)
+| informix-tables:   
+|_  ERROR: No credentials specified (see informix-table.username and informix-table.password)
+9102/tcp  open     jetdirect
+20000/tcp open     dnp
+44443/tcp filtered coldfusion-auth
+
+Nmap scan report for 61.155.159.18
+Host is up (0.036s latency).
+All 1000 scanned ports on 61.155.159.18 are filtered
+
+Nmap scan report for 124.14.9.234
+Host is up (0.030s latency).
+Not shown: 995 closed ports
+PORT     STATE    SERVICE
+80/tcp   open     http
+| http-domino-enum-passwords:   
+|_  ERROR: Failed to process results
+443/tcp  open     https
+| http-domino-enum-passwords:   
+|_  ERROR: Failed to process results
+1935/tcp open     rtmp
+3261/tcp filtered winshadow
+8080/tcp open     http-proxy
+|_http-default-accounts: [ERROR] HTTP request table is empty. This should not happen since we at least made one request.
+
+Nmap scan report for 115.29.196.133
+Host is up (0.054s latency).
+Not shown: 994 closed ports
+PORT      STATE    SERVICE
+80/tcp    open     http
+| http-domino-enum-passwords:   
+|_  ERROR: Failed to process results
+1154/tcp  filtered resacommunity
+3476/tcp  filtered nppmp
+5666/tcp  open     nrpe
+32771/tcp filtered sometimes-rpc5
+49157/tcp filtered unknown
+
+Nmap scan report for 42.81.4.92
+Host is up (0.0091s latency).
+All 1000 scanned ports on 42.81.4.92 are filtered
+
+Nmap scan report for dmd45.mail84.dmdelivery.com (61.147.84.45)
+Host is up (0.034s latency).
+Not shown: 999 filtered ports
+PORT    STATE  SERVICE
+113/tcp closed ident
+
+Nmap scan report for 211.162.1.164
+Host is up (0.032s latency).
+Not shown: 962 closed ports
+PORT      STATE    SERVICE
+80/tcp    open     http
+|_http-default-accounts: [ERROR] HTTP request table is empty. This should not happen since we at least made one request.
+| http-domino-enum-passwords:   
+|_  ERROR: Failed to process results
+81/tcp    open     hosts2-ns
+82/tcp    open     xfer
+88/tcp    open     kerberos-sec
+|_krb5-enum-users: ERROR: No Kerberos REALM was supplied, aborting ...
+89/tcp    open     su-mit-tg
+90/tcp    open     dnsix
+800/tcp   open     mdbs_daemon
+1009/tcp  filtered unknown
+1117/tcp  filtered ardus-mtrns
+1688/tcp  filtered nsjtp-data
+2323/tcp  open     3d-nfsd
+2811/tcp  filtered gsiftp
+3000/tcp  open     ppp
+3030/tcp  open     arepa-cas
+3551/tcp  filtered apcupsd
+4343/tcp  filtered unicall
+5222/tcp  open     xmpp-client
+5280/tcp  open     xmpp-bosh
+5560/tcp  filtered isqlplus
+7070/tcp  open     realserver
+8001/tcp  open     vcom-tunnel
+8009/tcp  open     ajp13
+8080/tcp  open     http-proxy
+|_http-default-accounts: [ERROR] HTTP request table is empty. This should not happen since we at least made one request.
+8081/tcp  open     blackice-icecap
+8083/tcp  open     us-srv
+8085/tcp  open     unknown
+8086/tcp  open     d-s-n
+8087/tcp  open     simplifymedia
+8088/tcp  open     radan-http
+|_http-default-accounts: [ERROR] HTTP request table is empty. This should not happen since we at least made one request.
+8090/tcp  open     unknown
+8888/tcp  open     sun-answerbook
+9000/tcp  open     cslistener
+9081/tcp  open     unknown
+9090/tcp  open     zeus-admin
+| informix-query:   
+|_  ERROR: No credentials specified (see informix-table.username and informix-table.password)
+| informix-tables:   
+|_  ERROR: No credentials specified (see informix-table.username and informix-table.password)
+9999/tcp  open     abyss
+15000/tcp open     hydap
+50300/tcp filtered unknown
+62078/tcp filtered iphone-sync
+
+Nmap scan report for 124.193.226.234
+Host is up (0.0023s latency).
+All 1000 scanned ports on 124.193.226.234 are filtered
+
+Nmap scan report for mail.ly.com (222.92.145.60)
+Host is up (0.037s latency).
+Not shown: 981 closed ports
+PORT      STATE    SERVICE
+21/tcp    filtered ftp
+80/tcp    open     http
+| http-domino-enum-passwords:   
+|_  ERROR: Failed to process results
+135/tcp   filtered msrpc
+139/tcp   filtered netbios-ssn
+443/tcp   open     https
+|_http-config-backup: ERROR: Script execution failed (use -d to debug)
+|_http-default-accounts: [ERROR] HTTP request table is empty. This should not happen since we at least made one request.
+| http-domino-enum-passwords:   
+|_  ERROR: Failed to process results
+|_http-userdir-enum: Potential Users: root, admin, administrator, webadmin, sysadmin, netadmin, guest, user, web, test
+445/tcp   filtered microsoft-ds
+593/tcp   filtered http-rpc-epmap
+901/tcp   filtered samba-swat
+1025/tcp  filtered NFS-or-IIS
+1105/tcp  filtered ftranhc
+1720/tcp  filtered h323q931
+1723/tcp  filtered pptp
+3128/tcp  filtered squid-http
+4444/tcp  filtered krb524
+6129/tcp  filtered unknown
+6566/tcp  filtered sane-port
+6667/tcp  filtered irc
+8082/tcp  filtered blackice-alerts
+52673/tcp filtered unknown
+
+Nmap scan report for 124.193.226.233
+Host is up (0.0023s latency).
+All 1000 scanned ports on 124.193.226.233 are filtered
+
+Nmap scan report for 61.155.159.193
+Host is up (0.040s latency).
+Not shown: 999 filtered ports
+PORT   STATE SERVICE
+80/tcp open  http
+|_http-default-accounts: [ERROR] HTTP request table is empty. This should not happen since we at least made one request.
+| http-domino-enum-passwords:   
+|_  ERROR: Failed to process results
+
+Nmap done: 17 IP addresses (17 hosts up) scanned in 385.95 seconds
