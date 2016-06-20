@@ -52,7 +52,7 @@ def initOptions():
 def getIPs():
     c = open(paths.DOMAIN_OUTPUT_PATH, 'r').read()
     f2 = open(paths.IP_PATH, 'w')
-    for each in getIP(c):
+    for each in getIP(c, True, True):
         f2.write(each + '\n')
     f2.close()
 
@@ -63,14 +63,14 @@ def runNmap(auto=False):
             base_command = 'nmap -iL ' + paths.IP_PATH
 
             print '\n' + '[e.g.] ' + base_command + ' -p1-65535 -sV --open --script=auth, brute, vuln'
-            print '[1] --script=auth,brute'
-            print '[2] -p1-65535 -sV --script=auth,default,brute'
+            print '[1] --open --script=auth,brute'
+            print '[2] -p1-65535 -sV --open --script=auth,default,brute'
 
             input_command = raw_input(' > ' + base_command) if not auto else 1
             if str(input_command) is '1':
-                input_command = '--script=auth,brute'
+                input_command = '--open --script=auth,brute'
             elif str(input_command) is '2':
-                input_command = '-p1-65535 -sV --script=auth,default,brute'
+                input_command = '-p1-65535 -sV --open --script=auth,default,brute'
             else:
                 pass
             command = base_command + ' ' + input_command
