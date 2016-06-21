@@ -10,6 +10,8 @@ from lib.data import paths, conf, logger
 from lib.log import CUSTOM_LOGGING
 from lib.extracts import getIP
 from thirdparty.colorama.initialise import init as winowsColorInit
+from lib.nmapXMLsort import xml2port
+from config import brutePort
 
 
 def openBrowser():
@@ -29,7 +31,10 @@ def setPaths():
         os.mkdir(paths.OUTPUT_PATH)
 
     # Nmap output
-    paths.NMAP_OUTPUT_PATH = os.path.abspath(os.path.join(paths.OUTPUT_PATH, 'nmap.txt'))
+    paths.TCP = os.path.abspath(os.path.join(paths.OUTPUT_PATH, 'nmap-tcp.xml'))
+    # paths.UDP = os.path.abspath(os.path.join(paths.OUTPUT_PATH, 'nmap-tcp.txt'))
+    # Hydra output
+    paths.HYDRA_OUTPUT_PATH = os.path.abspath(os.path.join(paths.OUTPUT_PATH, 'hydra.txt'))
 
     # subDomains output
     paths.DOMAIN_DICT = os.path.join(paths.ROOT_PATH, 'subDomainsBrute/dict')
@@ -50,74 +55,110 @@ def initOptions():
 
 
 def getIPs():
-    c = open(paths.DOMAIN_OUTPUT_PATH, 'r').read()
-    f2 = open(paths.IP_PATH, 'w')
-    for each in getIP(c, True, True):
-        f2.write(each + '\n')
-    f2.close()
+    ans = []
+    path1 = os.path.join(paths.OUTPUT_PATH, 'sublist3r.txt')
+    path2 = paths.DOMAIN_OUTPUT_PATH
+
+    if os.path.isfile(path1):
+        for each in open(path1).readlines():
+            p = subprocess.Popen('nslookup ' + each.strip(), shell=True, stdout=subprocess.PIPE,
+                                 stderr=subprocess.STDOUT)
+            c = p.stdout.read()
+            for ip in getIP(c, True, True):
+                ans.append(ip)
+    if os.path.isfile(path2):
+        for each in getIP(open(path2, 'r').read(), True, True):
+            ans.append(each)
+
+    ans = set(ans)
+    f = open(paths.IP_PATH, 'w')
+    for each in ans:
+        f.write(each + '\n')
+    f.close()
+
+
+def sortNmapXML():
+    if not os.path.isfile(paths.TCP):
+        return
+    d = xml2port(open(paths.TCP).read())
+    for key, value in d.items():
+        f = open(os.path.join(paths.OUTPUT_PATH, str(key)), 'w')
+        for each in value:
+            f.write(each + '\n')
+        f.close()
+
+
+def runSublist3r(auto=False):
+    '''
+    python sublist3r.py -d domain.com -o output
+    '''
+    if not auto:
+        try:
+            raw_input('> Enter to continue,Ctrl-C to jump this step.')
+        except KeyboardInterrupt:
+            return
+    try:
+        base_command = 'python ' + os.path.join(paths.ROOT_PATH,
+                                                'Sublist3r/sublist3r.py') + ' -d ' + conf.TARGET_DOMAIN + ' -o ' + os.path.join(
+            paths.OUTPUT_PATH, 'sublist3r.txt')
+
+        print '\n' + '[RUN] ' + base_command
+        input_command = raw_input(' > enable proxychains?[y/N]') if not auto else 'n'
+        if input_command in ['Y', 'y']:
+            command = 'proxychains ' + base_command
+        else:
+            command = base_command
+        logger.log(CUSTOM_LOGGING.SUCCESS, 'Execute Command: ' + command)
+        os.system(command)
+    except KeyboardInterrupt:
+        return
+        # except Exception, e:
+        #     print logger.log(CUSTOM_LOGGING.WARNING, 'Connection Error: ' + e)
+        #     pass
+
+
+def runSubDomainBrute(auto=False):
+    if not auto:
+        try:
+            raw_input('> Enter to continue,Ctrl-C to jump this step.')
+        except KeyboardInterrupt:
+            return
+    path = os.path.join(paths.ROOT_PATH, 'subDomainsBrute')
+    os.chdir(path)
+    command = 'python subDomainsBrute.py -t 50 ' + conf.TARGET_DOMAIN + ' -o ' + os.path.join(
+        paths.OUTPUT_PATH, 'subDomain.txt')
+    logger.log(CUSTOM_LOGGING.SUCCESS, 'Execute Command: ' + command)
+    os.system(command)
+    os.chdir(paths.ROOT_PATH)
 
 
 def runNmap(auto=False):
-    while True:
+    if not auto:
         try:
-            base_command = 'nmap -iL ' + paths.IP_PATH
-
-            print '\n' + '[e.g.] ' + base_command + ' -p1-65535 -sV --open --script=auth, brute, vuln'
-            print '[1] --open --script=auth,brute'
-            print '[2] -p1-65535 -sV --open --script=auth,default,brute'
-
-            input_command = raw_input(' > ' + base_command) if not auto else 1
-            if str(input_command) is '1':
-                input_command = '--open --script=auth,brute'
-            elif str(input_command) is '2':
-                input_command = '-p1-65535 -sV --open --script=auth,default,brute'
-            else:
-                pass
-            command = base_command + ' ' + input_command
-
-            logger.log(CUSTOM_LOGGING.SUCCESS, 'Execute Command: ' + command)
-            p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-            c = p.stdout.read()
-            print c
-            file = open(paths.NMAP_OUTPUT_PATH, 'w')
-            file.write(c)
-            file.close()
-            # retval = p.wait()
-
-            if auto:
-                break
+            raw_input('> Enter to continue,Ctrl-C to jump this step.')
         except KeyboardInterrupt:
-            break
-            # ip = conf.TARGET_DOMAIN
+            return
+    command = 'sudo nmap -iL ' + paths.IP_PATH + ' -Pn --open --script=auth,default,brute -oX ' + paths.TCP
+    os.system(command)
+
+
+def _hydraCommand(src, port):
+    command = 'hydra -q -f -en -M ' + src + ' -L ' + paths.USR_LIST + ' -P ' + paths.PWD_LIST + ' ' + str(port)
+    logger.log(CUSTOM_LOGGING.SYSINFO, 'Execute Command: ' + command)
+    try:
+        os.system(command)
+    except KeyboardInterrupt:
+        return
 
 
 def runHydra(auto=False):
-    '''
-    hydra -L userlist.txt -P pws.txt -M targets.txt ssh
-    '''
-    while True:
-        try:
-            base_command = 'hydra -M ' + paths.IP_PATH + ' -L ' + paths.USR_LIST + ' -P ' + paths.PWD_LIST
-
-            print '\n' + '[e.g.] ' + base_command + ' ssh'
-
-            input_command = raw_input(' > ' + base_command) if not auto else 'ssh'
-            command = base_command + ' ' + input_command
-
-            logger.log(CUSTOM_LOGGING.SUCCESS, 'Execute Command: ' + command)
-            p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-            c = p.stdout.read()
-            print c
-            file = open(paths.NMAP_OUTPUT_PATH, 'w')
-            file.write(c)
-            file.close()
-            # retval = p.wait()
-
-            if auto:
-                break
-        except KeyboardInterrupt:
-            break
-            # ip = conf.TARGET_DOMAIN
+    for k, v in brutePort.items():
+        fpath = os.path.join(paths.OUTPUT_PATH, k)
+        if os.path.isfile(fpath):
+            logger.log(CUSTOM_LOGGING.SUCCESS, 'Targets brute on procotol: ' + v)
+            _hydraCommand(fpath, v)
+    else:
+        logger.log(CUSTOM_LOGGING.SYSINFO, ' (hydra) No available ports for brute')
 
 
 # TODO

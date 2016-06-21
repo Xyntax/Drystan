@@ -2,29 +2,6 @@
 #  -*- coding: utf-8 -*-
 import re
 
-"""
----function getIP():---
-
-    Functions to extract IP from content string
-    edit by cdxy [i@cdxy.me]
-    May 23 Mon, 2016
-
-    parameters：
-      content
-      remove_duplicate  (default:true)
-      remove_private    (default:False)
-
-    usage:
-     from lib.util.extracts import *
-     ip_list = getIP(content)
-
-    private address：
-     10.0.0.0 - 10.255.255.255
-     172.16.0.0 - 172.31.255.255
-     192.168.0.0 - 192.168.255.255
-     127.0.0.0 - 127.255.255.255
-"""
-
 
 def getIP(content, remove_duplicate=True, remove_private=False):
     """
@@ -50,12 +27,9 @@ def _isPrivateIP(strict_IP):
     return True if re.match(p1, strict_IP) else False
 
 
-if __name__ == '__main__':
-    import sys
 
-    try:
-        c = sys.argv[1]
-    except:
-        c = raw_input('content > ')
-    finally:
-        print getIP(c)
+
+
+if __name__ == '__main__':
+    l = [80]
+    print xml2port(open('../output/sinosig.com/nmap-tcp.xml').read())
