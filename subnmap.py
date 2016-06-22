@@ -4,6 +4,7 @@ import sys
 from lib.data import paths, conf, logger
 from lib.log import CUSTOM_LOGGING
 from lib.common import initOptions, runNmap, getIPs, runHydra, runSublist3r, runSubDomainBrute, sortNmapXML
+from poc.zonetransfer import check as checkDNStransfer
 
 if '-h' in sys.argv:
     print 'Usage:\n python subnmap.py DOMAIN [auto] [j1] [j2] [j3]\n' \
@@ -20,20 +21,24 @@ auto = True if 'auto' in sys.argv else False
 
 initOptions()
 # logger.log(CUSTOM_LOGGING.SYSINFO, paths)
-logger.log(CUSTOM_LOGGING.SUCCESS, '=====Start runSublist3r => %s =====' % conf.TARGET_DOMAIN)
+
+logger.log(CUSTOM_LOGGING.SUCCESS, '===== Check DNS-zone-transfer =====')
+if 'j1' not in sys.argv: checkDNStransfer()
+
+logger.log(CUSTOM_LOGGING.SUCCESS, '===== Start runSublist3r => %s =====' % conf.TARGET_DOMAIN)
 if 'j1' not in sys.argv: runSublist3r(auto)
 
-logger.log(CUSTOM_LOGGING.SUCCESS, '=====Start subDomainsBrute => %s =====' % conf.TARGET_DOMAIN)
+logger.log(CUSTOM_LOGGING.SUCCESS, '===== Start subDomainsBrute => %s =====' % conf.TARGET_DOMAIN)
 if 'j1' not in sys.argv: runSubDomainBrute(auto)
 
-logger.log(CUSTOM_LOGGING.SUCCESS, '=====Extracting IPs from subDomains=====')
+logger.log(CUSTOM_LOGGING.SUCCESS, '===== Extracting IPs from subDomains =====')
 getIPs()
 
-logger.log(CUSTOM_LOGGING.SUCCESS, '=====Start Nmap=====')
+logger.log(CUSTOM_LOGGING.SUCCESS, '===== Start Nmap =====')
 if 'j2' not in sys.argv: runNmap()
 
-logger.log(CUSTOM_LOGGING.SUCCESS, '=====Extracting ports from nmap-result=====')
+logger.log(CUSTOM_LOGGING.SUCCESS, '===== Extracting ports from nmap-result =====')
 sortNmapXML()
 
-logger.log(CUSTOM_LOGGING.SUCCESS, '=====Start Hydra=====')
+logger.log(CUSTOM_LOGGING.SUCCESS, '===== Start Hydra =====')
 if 'j3' not in sys.argv: runHydra(auto)

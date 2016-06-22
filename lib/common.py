@@ -56,8 +56,14 @@ def initOptions():
 
 def getIPs():
     ans = []
+
     path1 = os.path.join(paths.OUTPUT_PATH, 'sublist3r.txt')
     path2 = paths.DOMAIN_OUTPUT_PATH
+    path3 = os.path.join(paths.OUTPUT_PATH, 'DNS-zoneTransfer.txt')
+
+    if os.path.isfile(path3):
+        for each in getIP(open(path3, 'r').read(), True, True):
+            ans.append(each)
 
     if os.path.isfile(path1):
         for each in open(path1).readlines():
@@ -66,6 +72,7 @@ def getIPs():
             c = p.stdout.read()
             for ip in getIP(c, True, True):
                 ans.append(ip)
+
     if os.path.isfile(path2):
         for each in getIP(open(path2, 'r').read(), True, True):
             ans.append(each)
@@ -75,6 +82,7 @@ def getIPs():
     for each in ans:
         f.write(each + '\n')
     f.close()
+    logger.log(CUSTOM_LOGGING.SYSINFO, 'Total: ' + str(len(ans)))
 
 
 def sortNmapXML():
@@ -130,6 +138,7 @@ def runSubDomainBrute(auto=False):
     logger.log(CUSTOM_LOGGING.SUCCESS, 'Execute Command: ' + command)
     os.system(command)
     os.chdir(paths.ROOT_PATH)
+    print ''  # it's a joke
 
 
 def runNmap(auto=False):
@@ -138,7 +147,7 @@ def runNmap(auto=False):
             raw_input('> Enter to continue,Ctrl-C to jump this step.')
         except KeyboardInterrupt:
             return
-    command = 'sudo nmap -iL ' + paths.IP_PATH + ' -Pn --open --script=auth,default,brute -oX ' + paths.TCP
+    command = 'sudo nmap -iL ' + paths.IP_PATH + ' -Pn --open --script=auth,default -oX ' + paths.TCP
     os.system(command)
 
 
@@ -152,19 +161,16 @@ def _hydraCommand(src, port):
 
 
 def runHydra(auto=False):
+    if not auto:
+        try:
+            raw_input('> Enter to continue,Ctrl-C to jump this step.')
+        except KeyboardInterrupt:
+            print ''
+            return
     for k, v in brutePort.items():
         fpath = os.path.join(paths.OUTPUT_PATH, k)
         if os.path.isfile(fpath):
-            logger.log(CUSTOM_LOGGING.SUCCESS, 'Targets brute on procotol: ' + v)
+            logger.log(CUSTOM_LOGGING.SUCCESS, 'Targets brute on service: ' + v)
             _hydraCommand(fpath, v)
     else:
         logger.log(CUSTOM_LOGGING.SYSINFO, ' (hydra) No available ports for brute')
-
-
-# TODO
-def nmapResultHandler():
-    c = open(paths.NMAP_OUTPUT_PATH, 'r').read()
-
-
-if __name__ == '__main__':
-    initOptions()
