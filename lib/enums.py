@@ -7,3 +7,8 @@ class CUSTOM_LOGGING:
     SUCCESS = 8
     ERROR = 7
     WARNING = 6
+
+
+class TARGET_MODE:
+    DOMAIN = 9
+    IP = 8

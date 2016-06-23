@@ -4,17 +4,17 @@ __author__ = 'xy'
 
 import os
 from lib.data import paths, conf, logger
-from lib.enums import CUSTOM_LOGGING
+from lib.enums import CUSTOM_LOGGING, TARGET_MODE
 from lib.common import auto
-from config import brutePort
+from config import brutePort, SUBNET_MASK
 from poc.zonetransfer import poc as zonetransfer_poc
 
 
 @auto
 def DNSzoneTransfer():
     path = os.path.join(paths.OUTPUT_PATH, 'DNS-zoneTransfer.txt')
-    logger.info('Target domain: ' + conf.TARGET_DOMAIN)
-    if zonetransfer_poc(conf.TARGET_DOMAIN, path):
+    logger.info('Target domain: ' + conf.TARGET)
+    if zonetransfer_poc(conf.TARGET, path):
         logger.warning('Vulnerable!')
         logger.info('Save results to %s' % path)
     else:
@@ -24,10 +24,10 @@ def DNSzoneTransfer():
 @auto
 def Sublist3r():
     base_command = 'python ' + os.path.join(paths.ROOT_PATH,
-                                            'Sublist3r/sublist3r.py') + ' -d ' + conf.TARGET_DOMAIN + ' -o ' + os.path.join(
+                                            'Sublist3r/sublist3r.py') + ' -d ' + conf.TARGET + ' -o ' + os.path.join(
         paths.OUTPUT_PATH, 'sublist3r.txt')
 
-    input_command = raw_input(' > enable proxychains?[y/N]') if not auto else 'n'
+    input_command = raw_input(' > enable proxychains?[y/N]') if not conf.AUTO else 'n'
     if input_command in ['Y', 'y']:
         command = 'proxychains ' + base_command
     else:
@@ -40,7 +40,7 @@ def Sublist3r():
 def SubDomainBrute():
     path = os.path.join(paths.ROOT_PATH, 'subDomainsBrute')
     os.chdir(path)
-    command = 'python subDomainsBrute.py -t 50 ' + conf.TARGET_DOMAIN + ' -o ' + os.path.join(
+    command = 'python subDomainsBrute.py -t 50 ' + conf.TARGET + ' -o ' + os.path.join(
         paths.OUTPUT_PATH, 'subDomain.txt')
     logger.log(CUSTOM_LOGGING.SUCCESS, 'Execute Command: ' + command)
     os.system(command)
@@ -50,13 +50,19 @@ def SubDomainBrute():
 
 @auto
 def Nmap():
-    command = 'sudo nmap -iL ' + paths.IP_PATH + ' -Pn --open --script=auth,default -oX ' + paths.TCP
+    if conf.MODE is TARGET_MODE.DOMAIN:
+        command = 'sudo nmap -iL ' + paths.IP_PATH + ' -Pn --open --script=auth,default -oX ' + paths.TCP
+    elif conf.MODE is TARGET_MODE.IP:
+        c = conf.TARGET + '/' + str(SUBNET_MASK)
+        command = 'sudo nmap %s -Pn --open --script=auth,default -oX %s' % (c, paths.TCP)
+    else:
+        raise Exception('conf.Mode incorrect in func [@auto Nmap()]')
     os.system(command)
 
 
 @auto
 def Hydra():
-    flag = False  # for the fuck Ctrl-C
+    flag = False  # fuck the for-else
 
     def _hydraCommand(src, port):
         command = 'hydra -q -f -en -M ' + src + ' -L ' + paths.USR_LIST + ' -P ' + paths.PWD_LIST + ' ' + str(port)
@@ -81,7 +87,37 @@ def WebSOC():
     if conf.has_key('EXIST_WEB_PORTS'):
         os.chdir(os.path.join(paths.ROOT_PATH, 'websoc-cli'))
         for each in conf.EXIST_WEB_PORTS:
-            os.system('python websoc-cli.py %s %s' % (conf.TARGET_DOMAIN, os.path.join(paths.OUTPUT_PATH, str(each))))
+            os.system('python websoc-cli.py %s %s' % (conf.TARGET, os.path.join(paths.OUTPUT_PATH, str(each))))
     else:
         logger.log(CUSTOM_LOGGING.SYSINFO, ' (websoc) No web application found, skip.')
     os.chdir(paths.ROOT_PATH)
+
+
+@auto
+def theHarvester():
+    os.chdir(os.path.join(paths.ROOT_PATH, 'theHarvester'))
+
+    command = "theharvester -d %s -l 100 -b all -f %s" % (conf.TARGET, paths.THEHARVESTER)
+
+    input_command = raw_input(' > enable proxychains?[y/N]') if not conf.AUTO else 'n'
+    if input_command in ['Y', 'y']:
+        command = 'proxychains ' + command
+
+    os.system(command)
+    os.chdir(paths.ROOT_PATH)
+
+
+@auto
+def whois():
+    command = "whois %s" % conf.TARGET
+    c = os.popen(command).read()
+    print c
+    open(os.path.join(paths.OUTPUT_PATH, 'whois.txt'), 'w').write(c)
+
+
+@auto
+def dig():
+    command = "dig -x %s" % conf.TARGET
+    c = os.popen(command).read()
+    print c
+    open(os.path.join(paths.OUTPUT_PATH, 'dig.txt'), 'w').write(c)

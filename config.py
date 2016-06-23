@@ -23,4 +23,6 @@ brutePort = {
 # define ports for WEB-application scan(http/https,spider,scripts)
 webPort = [80, 443]
 
+SUBNET_MASK = 24
+
 ENABLE_WEBSOC = True

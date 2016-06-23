@@ -3,14 +3,17 @@
 import sys
 from lib.common import initOptions, getIPs, sortNmapXML
 from lib.interface import *
+from lib.enums import TARGET_MODE
 from config import ENABLE_WEBSOC
 
 
 def main():
     if '-h' in sys.argv:
-        usage = 'Usage:\n python subnmap.py DOMAIN [auto] [j1] [j2] [j3]\n' \
-                'Example:\n python subnmap.py baidu.com' \
-                '\n python subnmap.py wooyun.org auto j1' \
+        usage = 'Usage:\n python drystan.py DOMAIN [auto] [j1] [j2] [j3]' \
+                '\n python drystan.py IP [auto]' \
+                'Example:\n python drystan.py baidu.com' \
+                '\n python drystan.py wooyun.org auto j1' \
+                '\n python drystan.py 132.13.211.2' \
                 '\n\nArgument:\n DOMAIN\t base domain for scanning.' \
                 '\nOptions:\n j1\tjump subdomain gathering (Sublist3r,subDomainsBrute).' \
                 '\n j2\tjump port scanning (nmap).' \
@@ -22,8 +25,13 @@ def main():
 
     initOptions()
     # logger.log(CUSTOM_LOGGING.SYSINFO, paths)
+    if conf.MODE is TARGET_MODE.IP:
+        sys.argv.append('j1')
 
     if 'j1' not in sys.argv:
+        whois()
+        dig()
+        theHarvester()
         DNSzoneTransfer()
         Sublist3r()
         SubDomainBrute()

@@ -27,14 +27,16 @@ def checkGithubDownload(url):
 githubDownloads = [
     "https://github.com/lijiejie/subDomainsBrute.git",
     "https://github.com/aboul3la/Sublist3r.git",
-    "https://github.com/Xyntax/websoc-cli"
+    "https://github.com/Xyntax/websoc-cli",
+    "https://github.com/laramies/theHarvester.git"
 ]
 
 Commands = [
     'nmap',
     'hydra',
     'nslookup',
-    'dig'
+    'dig',
+    'whois'
 ]
 
 if __name__ == '__main__':

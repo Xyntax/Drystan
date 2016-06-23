@@ -18,8 +18,9 @@ paths
     IP_PATH
 
 conf
-    TARGET_DOMAIN = ''
-    EXIST_WEB_PORTS = 
+    TARGET
+    MODE
+    EXIST_WEB_PORTS
 
 """
 

@@ -7,10 +7,11 @@ import sys
 import subprocess
 import webbrowser
 from lib.data import paths, conf, logger
-from lib.enums import CUSTOM_LOGGING
+from lib.enums import CUSTOM_LOGGING, TARGET_MODE
 from lib.extracts import getIP
 from lib.nmapXMLsort import xml2port
 from config import brutePort, webPort
+from thirdparty.IPy import IPy
 
 
 def checkRoot():
@@ -30,7 +31,7 @@ def openBrowser():
 def setPaths():
     # root & output
     paths.ROOT_PATH = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-    paths.OUTPUT_PATH = os.path.join(os.path.join(paths.ROOT_PATH, 'output'), conf.TARGET_DOMAIN)
+    paths.OUTPUT_PATH = os.path.join(os.path.join(paths.ROOT_PATH, 'output'), conf.TARGET)
     if not os.path.exists(paths.OUTPUT_PATH):
         os.mkdir(paths.OUTPUT_PATH)
 
@@ -50,10 +51,11 @@ def setPaths():
     paths.USR_LIST = os.path.abspath(os.path.join(paths.DICT_PATH, 'usr10.txt'))
     paths.PWD_LIST = os.path.abspath(os.path.join(paths.DICT_PATH, 'pwd40.txt'))
 
+    paths.THEHARVESTER = os.path.abspath(os.path.join(paths.OUTPUT_PATH, 'theHarvester.html'))
 
 def initOptions():
     checkRoot()
-    conf.TARGET_DOMAIN = sys.argv[1]
+    setTarget()
     setPaths()
 
 
@@ -130,3 +132,17 @@ def auto(func):
             return
 
     return tmp
+
+
+def setTarget():
+    ori_str = conf.TARGET = sys.argv[1]
+    for each in ori_str:
+        if each.isalpha():
+            conf.MODE = TARGET_MODE.DOMAIN
+            break
+    else:
+        conf.MODE = TARGET_MODE.IP
+        try:
+            _list = IPy.IP(ori_str)
+        except Exception, e:
+            sys.exit(logger.error('Invalid IP, %s' % e))
