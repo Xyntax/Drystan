@@ -4,13 +4,7 @@ __author__ = 'xy'
 import logging
 import sys
 
-
-class CUSTOM_LOGGING:
-    SYSINFO = 9
-    SUCCESS = 8
-    ERROR = 7
-    WARNING = 6
-
+from lib.enums import CUSTOM_LOGGING
 
 logging.addLevelName(CUSTOM_LOGGING.SYSINFO, "*")
 logging.addLevelName(CUSTOM_LOGGING.SUCCESS, "+")
@@ -28,7 +22,8 @@ try:
     LOGGER_HANDLER.level_map[logging.getLevelName("+")] = (None, "green", False)
     LOGGER_HANDLER.level_map[logging.getLevelName("-")] = (None, "red", False)
     LOGGER_HANDLER.level_map[logging.getLevelName("!")] = (None, "yellow", False)
-except ImportError:
+except ImportError, e:
+    print e
     LOGGER_HANDLER = logging.StreamHandler(sys.stdout)
 
 FORMATTER = logging.Formatter("\r[%(levelname)s] %(message)s", "%H:%M:%S")

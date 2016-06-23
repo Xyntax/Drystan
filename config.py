@@ -1,6 +1,8 @@
 # !/usr/bin/env python
 #  -*- coding: utf-8 -*-
 __author__ = 'xy'
+
+# hydra will brute all open ports below
 brutePort = {
     '110': 'pop3',
     '995': 'pop3s',
@@ -18,3 +20,7 @@ brutePort = {
     '6379': 'redis',
 }
 
+# define ports for WEB-application scan(http/https,spider,scripts)
+webPort = [80, 443]
+
+ENABLE_WEBSOC = True

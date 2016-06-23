@@ -7,11 +7,15 @@ import sys
 import subprocess
 import webbrowser
 from lib.data import paths, conf, logger
-from lib.log import CUSTOM_LOGGING
+from lib.enums import CUSTOM_LOGGING
 from lib.extracts import getIP
-from thirdparty.colorama.initialise import init as winowsColorInit
 from lib.nmapXMLsort import xml2port
-from config import brutePort
+from config import brutePort, webPort
+
+
+def checkRoot():
+    if os.geteuid():
+        sys.exit('Please run as root')
 
 
 def openBrowser():
@@ -48,15 +52,14 @@ def setPaths():
 
 
 def initOptions():
-    if subprocess.mswindows:
-        winowsColorInit()
+    checkRoot()
     conf.TARGET_DOMAIN = sys.argv[1]
     setPaths()
 
 
 def getIPs():
+    logger.log(CUSTOM_LOGGING.SUCCESS, '===== extract IP from subDomains =====')
     ans = []
-
     path1 = os.path.join(paths.OUTPUT_PATH, 'sublist3r.txt')
     path2 = paths.DOMAIN_OUTPUT_PATH
     path3 = os.path.join(paths.OUTPUT_PATH, 'DNS-zoneTransfer.txt')
@@ -82,11 +85,21 @@ def getIPs():
     for each in ans:
         f.write(each + '\n')
     f.close()
-    logger.log(CUSTOM_LOGGING.SYSINFO, 'Total: ' + str(len(ans)))
+    logger.log(CUSTOM_LOGGING.SYSINFO, 'Unique IP found: ' + str(len(ans)))
 
 
 def sortNmapXML():
+    logger.log(CUSTOM_LOGGING.SUCCESS, '===== sort nmap results =====')
+
+    def _getWebPorts(port_list=webPort):
+        l = []
+        for each in port_list:
+            if os.path.isfile(os.path.join(paths.OUTPUT_PATH, str(each))):
+                l.append(str(each))
+        return l
+
     if not os.path.isfile(paths.TCP):
+        logger.log(CUSTOM_LOGGING.WARNING, 'nmap result not found, skip.')
         return
     d = xml2port(open(paths.TCP).read())
     for key, value in d.items():
@@ -94,83 +107,26 @@ def sortNmapXML():
         for each in value:
             f.write(each + '\n')
         f.close()
+    conf.EXIST_WEB_PORTS = _getWebPorts()
+    logger.log(CUSTOM_LOGGING.SYSINFO, 'Different port found: %d' % len(d))
 
 
-def runSublist3r(auto=False):
+def auto(func):
+    '''''
+    A decorate function to track all function invoke information with DEBUG level
+    Usage:
+    @trace_func
+    def any_function(any parametet)
     '''
-    python sublist3r.py -d domain.com -o output
-    '''
-    if not auto:
+
+    def tmp(*args, **kargs):
+        logger.log(CUSTOM_LOGGING.SUCCESS, '===== Start %s =====' % func.__name__)
         try:
-            raw_input('> Enter to continue,Ctrl-C to jump this step.')
+            if not conf.AUTO:
+                raw_input(' >>> Press [Enter] to Continue, or [Ctrl-C] to skip current func.')
+            return func(*args, **kargs)
         except KeyboardInterrupt:
+            print ''  # it's a trick :)
             return
-    try:
-        base_command = 'python ' + os.path.join(paths.ROOT_PATH,
-                                                'Sublist3r/sublist3r.py') + ' -d ' + conf.TARGET_DOMAIN + ' -o ' + os.path.join(
-            paths.OUTPUT_PATH, 'sublist3r.txt')
 
-        print '\n' + '[RUN] ' + base_command
-        input_command = raw_input(' > enable proxychains?[y/N]') if not auto else 'n'
-        if input_command in ['Y', 'y']:
-            command = 'proxychains ' + base_command
-        else:
-            command = base_command
-        logger.log(CUSTOM_LOGGING.SUCCESS, 'Execute Command: ' + command)
-        os.system(command)
-    except KeyboardInterrupt:
-        return
-        # except Exception, e:
-        #     print logger.log(CUSTOM_LOGGING.WARNING, 'Connection Error: ' + e)
-        #     pass
-
-
-def runSubDomainBrute(auto=False):
-    if not auto:
-        try:
-            raw_input('> Enter to continue,Ctrl-C to jump this step.')
-        except KeyboardInterrupt:
-            return
-    path = os.path.join(paths.ROOT_PATH, 'subDomainsBrute')
-    os.chdir(path)
-    command = 'python subDomainsBrute.py -t 50 ' + conf.TARGET_DOMAIN + ' -o ' + os.path.join(
-        paths.OUTPUT_PATH, 'subDomain.txt')
-    logger.log(CUSTOM_LOGGING.SUCCESS, 'Execute Command: ' + command)
-    os.system(command)
-    os.chdir(paths.ROOT_PATH)
-    print ''  # it's a joke
-
-
-def runNmap(auto=False):
-    if not auto:
-        try:
-            raw_input('> Enter to continue,Ctrl-C to jump this step.')
-        except KeyboardInterrupt:
-            return
-    command = 'sudo nmap -iL ' + paths.IP_PATH + ' -Pn --open --script=auth,default -oX ' + paths.TCP
-    os.system(command)
-
-
-def _hydraCommand(src, port):
-    command = 'hydra -q -f -en -M ' + src + ' -L ' + paths.USR_LIST + ' -P ' + paths.PWD_LIST + ' ' + str(port)
-    logger.log(CUSTOM_LOGGING.SYSINFO, 'Execute Command: ' + command)
-    try:
-        os.system(command)
-    except KeyboardInterrupt:
-        return
-
-
-def runHydra(auto=False):
-    if not auto:
-        try:
-            raw_input('> Enter to continue,Ctrl-C to jump this step.')
-        except KeyboardInterrupt:
-            print ''
-            return
-    for k, v in brutePort.items():
-        fpath = os.path.join(paths.OUTPUT_PATH, k)
-        if os.path.isfile(fpath):
-            logger.log(CUSTOM_LOGGING.SUCCESS, 'Targets brute on service: ' + v)
-            _hydraCommand(fpath, v)
-    else:
-        logger.log(CUSTOM_LOGGING.SYSINFO, ' (hydra) No available ports for brute')
+    return tmp

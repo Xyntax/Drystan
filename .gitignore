@@ -8,3 +8,4 @@
 .svn
 .tox
 .idea/
+*.restore

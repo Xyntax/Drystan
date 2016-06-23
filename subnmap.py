@@ -1,44 +1,49 @@
 # !/usr/bin/env python
 #  -*- coding: utf-8 -*-
 import sys
-from lib.data import paths, conf, logger
-from lib.log import CUSTOM_LOGGING
-from lib.common import initOptions, runNmap, getIPs, runHydra, runSublist3r, runSubDomainBrute, sortNmapXML
-from poc.zonetransfer import check as checkDNStransfer
+from lib.common import initOptions, getIPs, sortNmapXML
+from lib.interface import *
+from config import ENABLE_WEBSOC
 
-if '-h' in sys.argv:
-    print 'Usage:\n python subnmap.py DOMAIN [auto] [j1] [j2] [j3]\n' \
-          'Example:\n python subnmap.py baidu.com' \
-          '\n python subnmap.py wooyun.org auto j1' \
-          '\n\nArgument:\n DOMAIN\t base domain for scanning.' \
-          '\nOptions:\n j1\tjump subdomain gathering (Sublist3r,subDomainsBrute).' \
-          '\n j2\tjump port scanning (nmap).' \
-          '\n j3\tjump bruteforce (hydra).' \
-          '\n auto\trun all steps automaticly with default settings.'
-    sys.exit(0)
 
-auto = True if 'auto' in sys.argv else False
+def main():
+    if '-h' in sys.argv:
+        usage = 'Usage:\n python subnmap.py DOMAIN [auto] [j1] [j2] [j3]\n' \
+                'Example:\n python subnmap.py baidu.com' \
+                '\n python subnmap.py wooyun.org auto j1' \
+                '\n\nArgument:\n DOMAIN\t base domain for scanning.' \
+                '\nOptions:\n j1\tjump subdomain gathering (Sublist3r,subDomainsBrute).' \
+                '\n j2\tjump port scanning (nmap).' \
+                '\n j3\tjump bruteforce (hydra).' \
+                '\n auto\trun all steps automaticly with default settings.'
+        sys.exit(usage)
 
-initOptions()
-# logger.log(CUSTOM_LOGGING.SYSINFO, paths)
+    conf.AUTO = True if 'auto' in sys.argv else False
 
-logger.log(CUSTOM_LOGGING.SUCCESS, '===== Check DNS-zone-transfer =====')
-if 'j1' not in sys.argv: checkDNStransfer()
+    initOptions()
+    # logger.log(CUSTOM_LOGGING.SYSINFO, paths)
 
-logger.log(CUSTOM_LOGGING.SUCCESS, '===== Start runSublist3r => %s =====' % conf.TARGET_DOMAIN)
-if 'j1' not in sys.argv: runSublist3r(auto)
+    if 'j1' not in sys.argv:
+        DNSzoneTransfer()
+        Sublist3r()
+        SubDomainBrute()
+    getIPs()
 
-logger.log(CUSTOM_LOGGING.SUCCESS, '===== Start subDomainsBrute => %s =====' % conf.TARGET_DOMAIN)
-if 'j1' not in sys.argv: runSubDomainBrute(auto)
+    if 'j2' not in sys.argv:
+        Nmap()
+    sortNmapXML()
 
-logger.log(CUSTOM_LOGGING.SUCCESS, '===== Extracting IPs from subDomains =====')
-getIPs()
+    if 'j3' not in sys.argv:
+        Hydra()
 
-logger.log(CUSTOM_LOGGING.SUCCESS, '===== Start Nmap =====')
-if 'j2' not in sys.argv: runNmap()
+    if 'jweb' not in sys.argv:
+        if ENABLE_WEBSOC:
+            WebSOC()
 
-logger.log(CUSTOM_LOGGING.SUCCESS, '===== Extracting ports from nmap-result =====')
-sortNmapXML()
 
-logger.log(CUSTOM_LOGGING.SUCCESS, '===== Start Hydra =====')
-if 'j3' not in sys.argv: runHydra(auto)
+if __name__ == '__main__':
+    try:
+        main()
+    except KeyboardInterrupt:
+        logger.log(CUSTOM_LOGGING.ERROR, 'User quit.')
+        sys.exit(0)
