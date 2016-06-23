@@ -6,7 +6,7 @@ import os
 from lib.data import paths, conf, logger
 from lib.enums import CUSTOM_LOGGING, TARGET_MODE
 from lib.common import auto
-from config import brutePort, SUBNET_MASK
+from config import brutePort
 from poc.zonetransfer import poc as zonetransfer_poc
 
 
@@ -53,7 +53,7 @@ def Nmap():
     if conf.MODE is TARGET_MODE.DOMAIN:
         command = 'sudo nmap -iL ' + paths.IP_PATH + ' -Pn --open --script=auth,default -oX ' + paths.TCP
     elif conf.MODE is TARGET_MODE.IP:
-        c = conf.TARGET + '/' + str(SUBNET_MASK)
+        c = '.'.join(conf.TARGET.split('.')[0:3]) + '.0/24'
         command = 'sudo nmap %s -Pn --open --script=auth,default -oX %s' % (c, paths.TCP)
     else:
         raise Exception('conf.Mode incorrect in func [@auto Nmap()]')
@@ -121,3 +121,12 @@ def dig():
     c = os.popen(command).read()
     print c
     open(os.path.join(paths.OUTPUT_PATH, 'dig.txt'), 'w').write(c)
+
+
+@auto
+def BingC():
+    os.chdir(os.path.join(paths.ROOT_PATH, 'BingC'))
+    path = os.path.join(paths.OUTPUT_PATH, 'bingc.txt')
+    command = "python bingC.py %s %s" % ('.'.join(conf.TARGET.split('.')[0:3]) + '.0/24', path)
+    os.system(command)
+    os.chdir(paths.ROOT_PATH)

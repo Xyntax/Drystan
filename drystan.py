@@ -1,52 +1,45 @@
 # !/usr/bin/env python
 #  -*- coding: utf-8 -*-
+"""
+Usage:
+  python drystan.py DOMAIN [auto] [j1] [j2] [j3]
+  python drystan.py IP [auto]
+
+Example:
+  python drystan.py baidu.com
+  python drystan.py wooyun.org auto j1
+  python drystan.py 132.13.211.2
+
+Argument:
+  DOMAIN      base target(domain) for scanning.
+  IP          base target(ip) for scanning.
+
+Options:
+  j1          jump subdomain gathering (Sublist3r,subDomainsBrute).
+  j2          jump port scanning (nmap).
+  j3          jump bruteforce (hydra).
+  auto        run all steps automaticly with default settings.
+"""
+
 import sys
-from lib.common import initOptions, getIPs, sortNmapXML
+from lib.common import initOptions
 from lib.interface import *
 from lib.enums import TARGET_MODE
-from config import ENABLE_WEBSOC
+from lib.flow import startDomainFlow, startIpFlow
 
 
 def main():
     if '-h' in sys.argv:
-        usage = 'Usage:\n python drystan.py DOMAIN [auto] [j1] [j2] [j3]' \
-                '\n python drystan.py IP [auto]' \
-                'Example:\n python drystan.py baidu.com' \
-                '\n python drystan.py wooyun.org auto j1' \
-                '\n python drystan.py 132.13.211.2' \
-                '\n\nArgument:\n DOMAIN\t base domain for scanning.' \
-                '\nOptions:\n j1\tjump subdomain gathering (Sublist3r,subDomainsBrute).' \
-                '\n j2\tjump port scanning (nmap).' \
-                '\n j3\tjump bruteforce (hydra).' \
-                '\n auto\trun all steps automaticly with default settings.'
-        sys.exit(usage)
+        sys.exit(__doc__)
 
     conf.AUTO = True if 'auto' in sys.argv else False
 
     initOptions()
     # logger.log(CUSTOM_LOGGING.SYSINFO, paths)
     if conf.MODE is TARGET_MODE.IP:
-        sys.argv.append('j1')
-
-    if 'j1' not in sys.argv:
-        whois()
-        dig()
-        theHarvester()
-        DNSzoneTransfer()
-        Sublist3r()
-        SubDomainBrute()
-    getIPs()
-
-    if 'j2' not in sys.argv:
-        Nmap()
-    sortNmapXML()
-
-    if 'j3' not in sys.argv:
-        Hydra()
-
-    if 'jweb' not in sys.argv:
-        if ENABLE_WEBSOC:
-            WebSOC()
+        startIpFlow()
+    else:
+        startDomainFlow()
 
 
 if __name__ == '__main__':

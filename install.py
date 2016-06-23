@@ -27,8 +27,9 @@ def checkGithubDownload(url):
 githubDownloads = [
     "https://github.com/lijiejie/subDomainsBrute.git",
     "https://github.com/aboul3la/Sublist3r.git",
-    "https://github.com/Xyntax/websoc-cli",
-    "https://github.com/laramies/theHarvester.git"
+    "https://github.com/Xyntax/websoc-cli.git",
+    "https://github.com/laramies/theHarvester.git",
+    "https://github.com/Xyntax/BingC.git"
 ]
 
 Commands = [
