@@ -5,7 +5,8 @@ __author__ = 'xy'
 import os
 from lib.data import paths, conf, logger
 from lib.enums import CUSTOM_LOGGING, TARGET_MODE
-from lib.common import auto
+from lib.common import auto, port
+from lib.port import portExploits
 from config import brutePort
 from poc.zonetransfer import poc as zonetransfer_poc
 
@@ -51,10 +52,12 @@ def SubDomainBrute():
 @auto
 def Nmap():
     if conf.MODE is TARGET_MODE.DOMAIN:
-        command = 'sudo nmap -iL ' + paths.IP_PATH + ' -Pn --open --script=auth,default -oX ' + paths.TCP
+        # command = 'sudo nmap -iL ' + paths.IP_PATH + ' -Pn --open --script=auth,default -oX ' + paths.TCP
+        command = 'sudo nmap -iL ' + paths.IP_PATH + ' -Pn --open -oX ' + paths.TCP
     elif conf.MODE is TARGET_MODE.IP:
         c = '.'.join(conf.TARGET.split('.')[0:3]) + '.0/24'
-        command = 'sudo nmap %s -Pn --open --script=auth,default -oX %s' % (c, paths.TCP)
+        # command = 'sudo nmap %s -Pn --open --script=auth,default -oX %s' % (c, paths.TCP)
+        command = 'sudo nmap %s -Pn --open -oX %s' % (c, paths.TCP)
     else:
         raise Exception('conf.Mode incorrect in func [@auto Nmap()]')
     os.system(command)
@@ -130,3 +133,54 @@ def BingC():
     command = "python bingC.py %s %s" % ('.'.join(conf.TARGET.split('.')[0:3]) + '.0/24', path)
     os.system(command)
     os.chdir(paths.ROOT_PATH)
+
+
+@auto
+def BBScan():
+    os.chdir(os.path.join(paths.ROOT_PATH, 'BBScan'))
+    if conf.MODE is TARGET_MODE.DOMAIN:
+        command = 'python BBScan.py -f ' + paths.IP_PATH + ' --browser'
+    elif conf.MODE is TARGET_MODE.IP:
+        command = 'python BBScan.py --host ' + conf.TARGET + ' --network 24 --browser'
+    else:
+        raise Exception('conf.Mode incorrect in func [@auto BBScan()]')
+    os.system(command)
+    res_file = os.path.join(paths.ROOT_PATH, 'BBScan/report/*.html')
+    tar_file = os.path.join(paths.OUTPUT_PATH, 'BBScan_res.html')
+    os.system('mv %s %s' % (res_file, tar_file))
+    os.chdir(paths.ROOT_PATH)
+    logger.log(CUSTOM_LOGGING.SYSINFO, 'reports file moved to %s.' % tar_file)
+
+
+# TODO 脚本统一化? 提取POC? 避免使用msf? msf的批量? 把跑命令的语句再抽象一层? 如何记录日志，在装饰器里?　
+# TODO 爆破脚本和hydra功能重复,没扫到的端口再存一个文件->测试WEB?
+
+@port
+def portScan():
+    notScanned = []
+    for _file in os.listdir(paths.PORT_PATH):
+        try:
+            _port = int(_file)
+            if portExploits.PORTS.has_key(_port):
+                commands = portExploits.PORTS[_port]
+                for command in commands:
+                    if 'nmap' in command:
+                        command = command.replace('$TARGET', '-iL ' + os.path.join(paths.PORT_PATH, _file))
+                        logger.info(command)
+                        os.system(command)
+                    elif 'msfconsole' in command:
+                        for ip in open(os.path.join(paths.RORT_PATH, _file)).readlines():
+                            command = command.replace('$TARGET', ip.strip())
+                            logger.info(command)
+                            os.system(command)
+                    # TODO 验证其它命令是否可用，待添加
+                    else:
+                        pass
+            else:
+                notScanned.append(_port)
+        # TODO
+        except Exception, e:
+            print e
+            continue
+    for each in notScanned:
+        logger.log(CUSTOM_LOGGING.SYSINFO, 'Several ports are not scanned: ' + str(each))

@@ -22,16 +22,24 @@ def startDomainFlow():
     sortNmapXML()
 
     if 'j3' not in sys.argv:
+        portScan()
         Hydra()
 
     if 'jweb' not in sys.argv:
+        BBScan()
         if ENABLE_WEBSOC:
             WebSOC()
 
 
 def startIpFlow():
     BingC()
+
     Nmap()
     sortNmapXML()
+    portScan()
+
+    BBScan()
+
     Hydra()
-    WebSOC()
+    if ENABLE_WEBSOC:
+        WebSOC()

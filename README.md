@@ -9,10 +9,10 @@
 How It Works
 ------------
 1. explore domain information. 
-2. search and enumerate subDomains.
+2. search and enumerate subDomains/IPs.
 3. extract all IP & ports.
 4. identify service.
-5. detect vulnerability.
+5. detect vulnerability(brute & exploit).
 
 
 Quick Start
