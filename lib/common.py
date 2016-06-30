@@ -102,7 +102,7 @@ def sortNmapXML():
     def _getWebPorts(port_list=webPort):
         l = []
         for each in port_list:
-            if os.path.isfile(os.path.join(paths.OUTPUT_PATH, str(each))):
+            if os.path.isfile(os.path.join(paths.PORT_PATH, str(each))):
                 l.append(str(each))
         return l
 

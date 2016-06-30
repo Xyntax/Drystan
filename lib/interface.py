@@ -87,10 +87,15 @@ def Hydra():
 
 @auto
 def WebSOC():
+    if conf.MODE is TARGET_MODE.DOMAIN:
+        projectName = conf.TARGET + '-sub-'
+    else:
+        projectName = conf.TARGET + '-C-'
     if conf.has_key('EXIST_WEB_PORTS'):
         os.chdir(os.path.join(paths.ROOT_PATH, 'websoc-cli'))
         for each in conf.EXIST_WEB_PORTS:
-            os.system('python websoc-cli.py %s %s' % (conf.TARGET, os.path.join(paths.OUTPUT_PATH, str(each))))
+            os.system(
+                'python websoc-cli.py %s %s' % (projectName + each, os.path.join(paths.PORT_PATH, str(each))))
     else:
         logger.log(CUSTOM_LOGGING.SYSINFO, ' (websoc) No web application found, skip.')
     os.chdir(paths.ROOT_PATH)
@@ -169,8 +174,10 @@ def portScan():
                         logger.info(command)
                         os.system(command)
                     elif 'msfconsole' in command:
-                        for ip in open(os.path.join(paths.RORT_PATH, _file)).readlines():
-                            command = command.replace('$TARGET', ip.strip())
+                        for ip in open(os.path.join(paths.PORT_PATH, _file)).readlines():
+                            command = command.replace('$TARGET', ip.strip()) \
+                                .replace('$USER', paths.USR_LIST)\
+                                .replace('$PASS', paths.PWD_LIST)
                             logger.info(command)
                             os.system(command)
                     # TODO 验证其它命令是否可用，待添加

