@@ -75,8 +75,8 @@ def Hydra():
         except KeyboardInterrupt:
             return
 
-    for k, v in brutePort.items():
-        fpath = os.path.join(paths.OUTPUT_PATH, k)
+    for port, v in brutePort.items():
+        fpath = os.path.join(paths.PORT_PATH, port)
         if os.path.isfile(fpath):
             flag = True
             logger.log(CUSTOM_LOGGING.SUCCESS, 'Targets brute on service: ' + v)
