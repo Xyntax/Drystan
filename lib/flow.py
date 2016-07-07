@@ -22,13 +22,15 @@ def startDomainFlow():
 
     if 'j3' not in sys.argv:
         portScan()
-        # Hydra()
+        Hydra()
 
     searchHTTP()
     if 'jweb' not in sys.argv:
         BBScan()
         if ENABLE_WEBSOC:
             WebSOC()
+        if ENABLE_POCSCAN:
+            pocscan()
 
 
 def startIpFlow():

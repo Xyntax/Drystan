@@ -33,7 +33,11 @@ def setPaths():
     # root & output
     paths.ROOT_PATH = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
-    paths.OUTPUT_PATH = os.path.join(os.path.join(paths.ROOT_PATH, 'output'), conf.TARGET)
+    paths.OUTPUT_BASE = os.path.join(paths.ROOT_PATH, 'output')
+    if not os.path.exists(paths.OUTPUT_BASE):
+        os.mkdir(paths.OUTPUT_BASE)
+
+    paths.OUTPUT_PATH = os.path.join(paths.OUTPUT_BASE, conf.TARGET)
     if not os.path.exists(paths.OUTPUT_PATH):
         os.mkdir(paths.OUTPUT_PATH)
 

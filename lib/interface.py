@@ -105,7 +105,7 @@ def WebSOC():
 def theHarvester():
     os.chdir(os.path.join(paths.ROOT_PATH, 'theHarvester'))
 
-    command = "theharvester -d %s -l 100 -b all -f %s" % (conf.TARGET, paths.THEHARVESTER)
+    command = "python theHarvester.py -d %s -l 100 -b all -f %s" % (conf.TARGET, paths.THEHARVESTER)
 
     input_command = 'y' if conf.AUTO else raw_input(' > enable proxychains?[y/N]')
     if input_command in ['Y', 'y']:
