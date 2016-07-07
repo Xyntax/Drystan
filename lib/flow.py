@@ -1,10 +1,9 @@
 # !/usr/bin/env python
 #  -*- coding: utf-8 -*-
-from lib.common import initOptions, getIPs, sortNmapXML
+from lib.common import initOptions, getIPs, sortNmapXML, searchHTTP
 from lib.interface import *
 import sys
-from lib.enums import TARGET_MODE
-from config import ENABLE_WEBSOC
+from config import *
 
 
 def startDomainFlow():
@@ -23,8 +22,9 @@ def startDomainFlow():
 
     if 'j3' not in sys.argv:
         portScan()
-        Hydra()
+        # Hydra()
 
+    searchHTTP()
     if 'jweb' not in sys.argv:
         BBScan()
         if ENABLE_WEBSOC:
@@ -38,8 +38,12 @@ def startIpFlow():
     sortNmapXML()
     portScan()
 
+    Hydra()
+
+    searchHTTP()
     BBScan()
 
-    Hydra()
     if ENABLE_WEBSOC:
         WebSOC()
+    if ENABLE_POCSCAN:
+        pocscan()

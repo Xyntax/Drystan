@@ -39,12 +39,17 @@ def GithubUpdate():
         os.system('cd %s && git pull' % dirname)
 
 
+def PythonPackages():
+    os.system('pip install -r requirements.txt')
+
+
 githubDownloads = [
     "https://github.com/lijiejie/subDomainsBrute.git",
     "https://github.com/lijiejie/BBScan.git",
     "https://github.com/aboul3la/Sublist3r.git",
     "https://github.com/Xyntax/websoc-cli.git",
     "https://github.com/Xyntax/BingC.git",
+    "https://github.com/Xyntax/pocscan-cli.git",
     "https://github.com/laramies/theHarvester.git"
 ]
 
@@ -55,13 +60,14 @@ Commands = [
     'dig',
     'whois',
     'msfconsole',
-    'git'
+    'git',
+    'pip'
 ]
 
 if __name__ == '__main__':
-
     checkCommand()
     checkGithubDownload()
+    PythonPackages()
     if 'update' in sys.argv:
         updateCommand()
         GithubUpdate()

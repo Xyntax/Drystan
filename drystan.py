@@ -32,7 +32,6 @@ def main():
     if '-h' in sys.argv:
         sys.exit(__doc__)
 
-    conf.AUTO = True if 'auto' in sys.argv else False
 
     initOptions()
     # logger.log(CUSTOM_LOGGING.SYSINFO, paths)

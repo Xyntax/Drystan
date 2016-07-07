@@ -24,3 +24,4 @@ brutePort = {
 webPort = [80, 443]
 
 ENABLE_WEBSOC = True
+ENABLE_POCSCAN = True

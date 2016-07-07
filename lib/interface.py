@@ -28,7 +28,7 @@ def Sublist3r():
                                             'Sublist3r/sublist3r.py') + ' -d ' + conf.TARGET + ' -o ' + os.path.join(
         paths.OUTPUT_PATH, 'sublist3r.txt')
 
-    input_command = raw_input(' > enable proxychains?[y/N]') if not conf.AUTO else 'n'
+    input_command = 'y' if conf.AUTO else raw_input(' > enable proxychains?[y/N]')
     if input_command in ['Y', 'y']:
         command = 'proxychains ' + base_command
     else:
@@ -53,9 +53,9 @@ def SubDomainBrute():
 def Nmap():
     if conf.MODE is TARGET_MODE.DOMAIN:
         # command = 'sudo nmap -iL ' + paths.IP_PATH + ' -Pn --open --script=auth,default -oX ' + paths.TCP
-        command = 'sudo nmap -iL ' + paths.IP_PATH + ' -Pn --open -oX ' + paths.TCP
+        command = 'sudo nmap -iL ' + paths.IP_PATH + ' -Pn --open --script=auth,brute,default -oX ' + paths.TCP
     elif conf.MODE is TARGET_MODE.IP:
-        c = '.'.join(conf.TARGET.split('.')[0:3]) + '.0/24'
+        c = '.'.join(conf.TARGET.split('.')[0:3]) + '.0/24 --script=auth,brute,default '
         # command = 'sudo nmap %s -Pn --open --script=auth,default -oX %s' % (c, paths.TCP)
         command = 'sudo nmap %s -Pn --open -oX %s' % (c, paths.TCP)
     else:
@@ -107,7 +107,7 @@ def theHarvester():
 
     command = "theharvester -d %s -l 100 -b all -f %s" % (conf.TARGET, paths.THEHARVESTER)
 
-    input_command = raw_input(' > enable proxychains?[y/N]') if not conf.AUTO else 'n'
+    input_command = 'y' if conf.AUTO else raw_input(' > enable proxychains?[y/N]')
     if input_command in ['Y', 'y']:
         command = 'proxychains ' + command
 
@@ -143,12 +143,7 @@ def BingC():
 @auto
 def BBScan():
     os.chdir(os.path.join(paths.ROOT_PATH, 'BBScan'))
-    if conf.MODE is TARGET_MODE.DOMAIN:
-        command = 'python BBScan.py -f ' + paths.IP_PATH + ' --browser'
-    elif conf.MODE is TARGET_MODE.IP:
-        command = 'python BBScan.py --host ' + conf.TARGET + ' --network 24 --browser'
-    else:
-        raise Exception('conf.Mode incorrect in func [@auto BBScan()]')
+    command = 'python BBScan.py -f ' + paths.HTTP + ' --browser'
     os.system(command)
     res_file = os.path.join(paths.ROOT_PATH, 'BBScan/report/*.html')
     tar_file = os.path.join(paths.OUTPUT_PATH, 'BBScan_res.html')
@@ -176,7 +171,7 @@ def portScan():
                     elif 'msfconsole' in command:
                         for ip in open(os.path.join(paths.PORT_PATH, _file)).readlines():
                             command = command.replace('$TARGET', ip.strip()) \
-                                .replace('$USER', paths.USR_LIST)\
+                                .replace('$USER', paths.USR_LIST) \
                                 .replace('$PASS', paths.PWD_LIST)
                             logger.info(command)
                             os.system(command)
@@ -191,3 +186,11 @@ def portScan():
             continue
     for each in notScanned:
         logger.log(CUSTOM_LOGGING.SYSINFO, 'Several ports are not scanned: ' + str(each))
+
+
+@auto
+def pocscan():
+    os.chdir(os.path.join(paths.ROOT_PATH, 'pocscan-cli'))
+    command = 'python pocscan-cli.py ' + paths.HTTP
+    os.system(command)
+    os.chdir(paths.ROOT_PATH)

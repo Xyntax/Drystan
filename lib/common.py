@@ -12,6 +12,7 @@ from lib.extracts import getIP
 from lib.nmapXMLsort import xml2port
 from config import brutePort, webPort
 from thirdparty.IPy import IPy
+from lib.util.checkhttp import checkFolderHTTP
 
 
 def checkRoot():
@@ -40,6 +41,7 @@ def setPaths():
     if not os.path.exists(paths.PORT_PATH):
         os.mkdir(paths.PORT_PATH)
 
+    paths.HTTP = os.path.abspath(os.path.join(paths.OUTPUT_PATH, 'http.txt'))
     # Nmap output
     paths.TCP = os.path.abspath(os.path.join(paths.OUTPUT_PATH, 'nmap-tcp.xml'))
     # paths.UDP = os.path.abspath(os.path.join(paths.OUTPUT_PATH, 'nmap-tcp.txt'))
@@ -61,34 +63,45 @@ def setPaths():
 
 def initOptions():
     checkRoot()
+    conf.AUTO = False
+    if 'auto' in sys.argv:
+        conf.AUTO = True
+        logger.log(CUSTOM_LOGGING.SYSINFO, 'Start auto mode~')
     setTarget()
     setPaths()
 
 
 def getIPs():
+    def extract(name):
+        _ans = set()
+        path = os.path.join(paths.OUTPUT_PATH, name)
+        if os.path.isfile(path):
+            logger.log(CUSTOM_LOGGING.SYSINFO, 'Extracting IPs from ' + name)
+            for each in getIP(open(path, 'r').read(), True, True):
+                _ans.add(each)
+            logger.log(CUSTOM_LOGGING.SYSINFO, 'Total: ' + str(len(_ans)))
+        return _ans
+
     logger.log(CUSTOM_LOGGING.SUCCESS, '===== extract IP from subDomains =====')
-    ans = []
+    ans = set()
+    ans |= extract('subDomain.txt')
+    ans |= extract('DNS-zoneTransfer.txt')
+    ans |= extract('theHarvester.html')
+
+    # TODO  oh, fuck this func!
     path1 = os.path.join(paths.OUTPUT_PATH, 'sublist3r.txt')
-    path2 = paths.DOMAIN_OUTPUT_PATH
-    path3 = os.path.join(paths.OUTPUT_PATH, 'DNS-zoneTransfer.txt')
-
-    if os.path.isfile(path3):
-        for each in getIP(open(path3, 'r').read(), True, True):
-            ans.append(each)
-
     if os.path.isfile(path1):
+        __ans = set()
+        logger.log(CUSTOM_LOGGING.SYSINFO, 'Extracting IPs from sublist3r.txt')
         for each in open(path1).readlines():
             p = subprocess.Popen('nslookup ' + each.strip(), shell=True, stdout=subprocess.PIPE,
                                  stderr=subprocess.STDOUT)
             c = p.stdout.read()
             for ip in getIP(c, True, True):
-                ans.append(ip)
+                __ans.add(ip)
+        logger.log(CUSTOM_LOGGING.SYSINFO, 'Total: ' + str(len(__ans)))
+        ans |= __ans
 
-    if os.path.isfile(path2):
-        for each in getIP(open(path2, 'r').read(), True, True):
-            ans.append(each)
-
-    ans = set(ans)
     f = open(paths.IP_PATH, 'w')
     for each in ans:
         f.write(each + '\n')
@@ -177,3 +190,17 @@ def setTarget():
             _list = IPy.IP(ori_str)
         except Exception, e:
             sys.exit(logger.error('Invalid IP, %s' % e))
+
+
+def searchHTTP():
+    logger.log(CUSTOM_LOGGING.SUCCESS, '===== Searching IP and ports on HTTP protocol =====')
+    f = open(paths.HTTP, 'w')
+    ans = checkFolderHTTP(paths.PORT_PATH)
+    for each in ans:
+        f.write(each + '\n')
+    f.close()
+    logger.log(CUSTOM_LOGGING.SYSINFO, 'Total: ' + str(len(ans)))
+
+
+if __name__ == '__main__':
+    print getIP(open('../output/cnnc.com.cn/subDomain.txt', 'r').read(), True, True)

@@ -31,9 +31,9 @@ You can modify the system settings manually by editing the config file:
 Tools Already Included
 ----------------------
 1. domain info
-  * `dig`
-  * `whois`
-  * `nslookup`
+  * dig
+  * whois
+  * nslookup
   * theHarvester
 2. subdomains
   * Sublist3r
@@ -50,3 +50,4 @@ Tools Already Included
 7. web application
   * BBScan
   * WebSOC
+  * pocscan
